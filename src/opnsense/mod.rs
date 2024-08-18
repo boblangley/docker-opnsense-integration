@@ -6,7 +6,7 @@ use json::JsonValue;
 use std::error::Error;
 
 // Define a OPNSense struct to hold the API configuration
-pub struct OPNSense {
+pub struct OPNSenseConfig {
     client: Client,
     hostname: String,
     api_key: String,
@@ -15,21 +15,24 @@ pub struct OPNSense {
     local_ip_address: String
 }
 
-// Define a static variable to hold the OPNSense instance
-static CONFIG: Lazy<Mutex<Option<OPNSense>>> = Lazy::new(|| Mutex::new(None));
+pub struct OPNSenseAPI {
+    config: OPNSenseConfig
+}
 
-impl OPNSense {
+pub struct UnboundHostOverridesAPI
+{
+    base_api: OPNSenseAPI
+}
+
+
+impl OPNSenseAPI {
     // Initialize the Config with the provided values
-    pub fn initialize(client: Client, hostname: String, api_key: String, api_secret: String, wan_interface: String, local_ip_address: String) {
-        let mut opnsense = CONFIG.lock().unwrap();
-        *opnsense = Some(OPNSense {
-            client,
-            hostname,
-            api_key,
-            api_secret,
-            wan_interface,
-            local_ip_address
-        });
+    pub fn initialize(&config: OPNSenseConfig) -> OPNSenseAPI
+    {
+        OPNSenseAPI
+        {
+            config
+        };
     }
 
     // Private function to perform a POST API call
@@ -79,12 +82,18 @@ impl OPNSense {
         } else {
             Err(format!("Failed to send GET request: {}", response.status()).into())
         }
-    }
+    }    
+
+    pub mod search_firewall_source_nat_rules;
+    pub mod search_existing_unbound_host_overrides;
+    pub mod add_firewall_source_nat_rule;
 }
 
+
+
 pub mod sourcenatrule;
-pub mod search_firewall_source_nat_rules;
-pub mod search_existing_unbound_host_overrides;
-pub mod add_firewall_source_nat_rule;
+
+
+
 pub mod hostoverride;
 pub mod add_unbound_host_override;
