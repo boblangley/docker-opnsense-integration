@@ -1,0 +1,25 @@
+version: '3.8'
+
+services:
+  rust-app:
+    image: your_image_name:latest
+    container_name: rust_app
+    restart: always
+    volumes:
+      - /path/to/your/root.pem:/certs/root.pem
+      - /path/to/your/intermediate.pem:/certs/intermediate.pem
+    environment:
+      - OPNSENSE_API_IP=your_api_ip
+      - OPNSENSE_API_KEY=your_api_key
+      - OPNSENSE_API_SECRET=your_api_secret
+      - WAN_INTERFACE=your_wan_interface
+      - LOCAL_IP_ADDRESS=your_local_ip_address
+      - CONTAINER_POLLING_INTERVAL=60
+    ports:
+      - "8080:8080"  # Adjust port mapping if needed
+    networks:
+      - default
+
+networks:
+  default:
+    driver: bridge
